@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<style type="text/css">
+		#blackBoard{
+			border: 10px solid brown;
+			background: green;
+			font-style: italic;
+			font-weight:bold;
+			min-height: 500px;
+			font-size: 30px;
+			color: white;
+		}
+		#explIndex li{
+			text-decoration: underline;
+			font-size: 25px;
+		}
+		#explIndex li:hover{
+			cursor: pointer;
+		}
+	</style>
+</head>
+<body>
+<div id="blackBoard"></div>
+
+<script type="text/javascript">
+	var stop = false;
+	function Explanation(phrase, translation, wordsEng, wordsRu){
+		this.phrase = phrase;
+		this.translation = translation;
+		this.wordsEng = wordsEng;
+		this.wordsRu = wordsRu;
+
+		/*служебные*/
+		this.blackBoard = document.getElementById("blackBoard");
+		this.synth = window.speechSynthesis;
+		/*функции*/
+		this.sayEng = function(){
+			let utterance = new SpeechSynthesisUtterance(this.phrase);
+				utterance.lang = "en-US";
+			this.synth.speak(utterance);
+		};
+		this.sayRus = function(){
+			let utterance = new SpeechSynthesisUtterance(this.translation);
+				utterance.lang = "ru";
+			this.synth.speak(utterance);
+		};
+		this.displayPhrase = function(){
+			let p = document.createElement('p');
+				p.textContent = this.phrase;
+			this.blackBoard.appendChild(p);
+		};
+		this.displayTranslation = function(){
+			let p = document.createElement('p');
+				p.textContent = this.translation;
+			this.blackBoard.appendChild(p);
+		};
+		this.displayAndSayPhraseAndTranslation = function(){
+			this.displayPhrase();
+			this.sayEng();
+			this.displayTranslation();
+			this.sayRus();
+		}
+		this.displayWords = function(){
+			let ul = document.createElement("ul");
+			this.blackBoard.appendChild(ul);
+			for(i=0; i<this.wordsEng.length; i++){
+				let li = document.createElement('li');
+				li.textContent = this.wordsEng[i] + " - " + this.wordsRu[i];
+				this.blackBoard.querySelector("ul").appendChild(li);
+			}
+		};
+		this.sayWords = function(){
+			if(stop === false){
+				console.log("stop = false");
+				for(i=0; i<this.wordsEng.length; i++){
+					let utterance = new SpeechSynthesisUtterance(this.wordsEng[i]);
+						utterance.lang = "en-US";
+					this.synth.speak(utterance);
+						utterance = new SpeechSynthesisUtterance(this.wordsRu[i]);
+						utterance.lang = "ru";
+					this.synth.speak(utterance);
+				}
+			}		
+		};
+
+		this.explain = function(){
+			this.blackBoard.textContent = "";
+			this.displayAndSayPhraseAndTranslation();
+			this.sayWords();
+			this.displayWords();
+			this.sayEng();
+		}
+	}
+</script>
+<script type="text/javascript">
+	var explanations = [];
+	explanations.push( new Explanation(
+		"Participants of the UNESCO group are requested to go to exit 3!"
+		,"Просим участников группу ЮНЕСКО пройти к выходу номер 3!"
+		,[
+			"participant"
+			,"participate"
+			,"request"
+			,"are requested"
+			,"exit"
+
+		]
+		,[
+			"участник"
+			,"участвовать"
+			,"просить"
+			,"их просят"
+			,"выход, путь (в аэропорту, на вокзале)"
+		]
+		));
+	/*explanations.push(new Explanation(фраза, перевод, массивНовыхСловНаАнгл, массивНовыхСловНаРусском));*/
+	/*
+	explanations.push(new Explanation(
+		"фраза"
+		,"перевод"
+		,[
+			"массивНовыхСловНаАнгл"
+			,""
+		] 
+		,[
+			"массивНовыхСловНаРусском"
+			,""
+		]
+		));
+	*/
+	explanations.push(new Explanation(
+		"We invite you to an international congress in Moscow"
+		,"Мы приглашаем вас на международный конгресс в Москве"
+		,[
+			'we'
+			,"invite"
+			,"invite you"
+			,"international"
+			,"congress"
+			,"Moscow"
+		] 
+		,[
+			"мы"
+			,"приглашаем"
+			,"приглашаем тебя, или приглашаем вас"
+			,"международный"
+			,"конгресс"
+			,"Москва"
+		]
+		));
+	explanations.push(new Explanation(
+		"Excuse me, are you Alice?"
+		,"Извините, вы Алиса?"
+		,[
+			"excuse me"
+			,"sorry"
+		] 
+		,[
+			"извините. Говорится для того, чтобы привлечь внимание"
+			,"извините, простите. Говорится, когда просишь прощения за какой-то поступок"
+		]
+		));
+
+</script>
+<script type="text/javascript">
+	var h3 = document.createElement("h3");
+		h3.textContent = "Список фраз в этом уроке";
+	document.body.appendChild(h3);
+	var ul = document.createElement("ul");
+		ul.setAttribute("id","explIndex");
+	document.body.appendChild(ul)
+	let explIndex = document.getElementById('explIndex');
+
+	for(i=0; i<explanations.length; i++){
+
+		var li = document.createElement("li");
+			li.textContent = explanations[i].phrase;
+			li.setAttribute("class", "sound"+i);
+			li.addEventListener("click", function(){
+				let cnt = Number(this.className.slice(5));
+
+				explanations[cnt].explain();
+			});
+		
+		explIndex.appendChild(li);
+	}
+</script>
+</body>
+</html>
